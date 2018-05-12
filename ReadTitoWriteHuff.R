@@ -26,7 +26,7 @@ location_weights$PARKING
 distance_table <- read_csv("TitosHeavyGravityGrids.csv")
 #It didn't work (some grids had pound keys & some didn't and it didn't read in), so try exporting an Excel version
 
-distance_table <- read_excel("TitosHeavyGravityGrids.xlsx")
+distance_table <- read_excel("DistExport18.xlsx")
 
 # Only keep the location key, the MG key, and the distance field
 dtx <- distance_table %>% 
@@ -109,7 +109,7 @@ sum(basis_probabilities)
 basis_probabilities
 
 pp1 <- dtxg %>% select(k_to,PP1)
-write_excel_csv(pp1,"Tito11.csv")
+write_excel_csv(pp1,"Tito11a.csv")
 
 ######## Other way of doing things
 ## microgrid 18
