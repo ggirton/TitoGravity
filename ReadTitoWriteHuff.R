@@ -3,7 +3,8 @@ library(magrittr)
 library(readxl)
 
 ## Read the five locations with their weights
-## (This is basically just 1 record.)
+## (This basically becomes just 1 record.)
+# The key must match the key of the incoming point-to-point distance table
 location_weights <- read_csv("titos-expanding-locations.csv",  col_types = 
                             cols(
   KEY = col_character(),
@@ -17,18 +18,15 @@ location_weights <- read_csv("titos-expanding-locations.csv",  col_types =
 lweights <- transmute(location_weights, key=KEY, parking = PARKING)
 
 # check it out!
-location_weights$PARKING
-
+# location_weights$PARKING
+lweights
 # lweights[4,2] <- 5123
 
 
-# Get the file exported by the Export Distance function.
-distance_table <- read_csv("TitosHeavyGravityGrids.csv")
-#It didn't work (some grids had pound keys & some didn't and it didn't read in), so try exporting an Excel version
-
 distance_table <- read_excel("DistExport18.xlsx")
+# some grids had pound keys & will have to prepend later
 
-# Only keep the location key, the MG key, and the distance field
+# Only keep the destination location key, the origion location (MicroGrid) key, and the distance field
 dtx <- distance_table %>% 
   transmute(key = `key_from:From key`, 
              k_to = `key_to:To key`,
@@ -36,17 +34,8 @@ dtx <- distance_table %>%
     arrange(k_to) 
 
 
-# Make a table that has the things necessary for the equation
-model_source <- inner_join(dtx,lweights, by ='key', copy = TRUE)
-head(model_source)
-# That's it! but of course, look at it
-View(model_source)
-# Actually, that's not it at all!  You have to make 5 GP values for each grid, not one, duh!
-#  And then you have to say which is the biggest one, double duh!
-
-# Back to the drawing board!
-
 ## get the grouped values by destination K_TO  (microgrid, of which there are 5 one for each location)
+
 dtxg <- group_by(dtx, k_to) %>%
   do(distances=.$distance, locations = .$key ) %T>% str()
 
@@ -56,7 +45,7 @@ dtxg <- group_by(dtx, k_to) %>%
 
 ## Probability of Patronage    = sigma gfuncs of(12345) 
 
-## the question is, what are alpha and beta?
+## the question is, what do you want to have for alpha and beta?
 
 huff_raw <- function(GLA, alphaAREA, DISTANCE, betaDISTANCE) {
   # print(DISTANCE)
